@@ -13,6 +13,7 @@ from copy import deepcopy
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.utils import OneLogin_Saml2_Utils, OneLogin_Saml2_Error, OneLogin_Saml2_ValidationError, return_false_on_exception
 from onelogin.saml2.xml_utils import OneLogin_Saml2_XML
+from onelogin.saml2.xmlparser import tostring, fromstring, LXMLBROKEN
 
 
 class OneLogin_Saml2_Response(object):
@@ -47,6 +48,12 @@ class OneLogin_Saml2_Response(object):
             decrypted_document = deepcopy(self.document)
             self.encrypted = True
             self.decrypted_document = self._decrypt_assertion(decrypted_document)
+            # workaround https://github.com/onelogin/python3-saml/issues/292
+            # see also:
+            # https://bugs.launchpad.net/lxml/+bug/1960668
+            # https://mail.python.org/archives/list/lxml@python.org/thread/SCMXQYGN7CQMSPJI3PEW2YBT4YZKNML2/
+            if LXMLBROKEN:
+                self.decrypted_document = fromstring(tostring(self.decrypted_document))
 
     def is_valid(self, request_data, request_id=None, raise_exceptions=False):
         """

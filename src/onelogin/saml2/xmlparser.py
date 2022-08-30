@@ -15,6 +15,8 @@ import threading
 from lxml import etree as _etree
 
 LXML3 = _etree.LXML_VERSION[0] >= 3
+# set an upper bound on this check when a known-fixed lxml version is available
+LXMLBROKEN = _etree.LXML_VERSION >= (4, 7, 1)
 
 __origin__ = "lxml.etree"
 
